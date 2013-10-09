@@ -22,7 +22,11 @@ class MovieScript(object):
         if self._debug:
             print 'Formatting url for %s into proper form...' % self.title
         #insert hypens into url
-        url = str(self.url[14:-12]).split(' ')
+        urls = str(self.url[14:-12]).split(' ')
+        #colons aren't used in urls
+        for url in urls:
+            if url[-1] == ':':
+                url = url[:-1]
         self.url = root + '-'.join(url) + '.html'
 
     def getScriptText(self):
@@ -43,9 +47,8 @@ class MovieScript(object):
     def _findScriptText(self, soup):
         if self._debug:
             print 'Finding Script text for %s...' % self.title
-        txt = soup.findAll("table")[12:13]
-        print txt
-        self.script = ''.join(txt[0].findAll(text=True))
+        # Is under 0, 1 or 2 <pre> tags (I think)
+        self.script = ''.join(soup.findAll("td", {"class" : "scrtext"}, text=True))
 
     def _fmtFilename(self):
         if self._debug:
@@ -61,7 +64,8 @@ class MovieScript(object):
         if self._debug:
             print 'Writing script to file for %s...' % self.title
         fp = open(os.path.join('scripts', self.filename), 'w')
-        fp.write(self.script)
+        if not self.script==None:
+            fp.write(self.script)
         fp.close()
 
 class ScriptParse(object):
@@ -91,7 +95,10 @@ class ScriptParse(object):
         moviePs = self._getMovieListNodes(mpSoup)
         scriptList = self._convertTags(moviePs)
 
-        for script in scriptList[:5]:
+        for script in scriptList:
+            #Edge Case
+            if script.title == '8 Mile':
+                continue
             script.formatUrl()
             script.getScriptText()
             script.writeFile()
