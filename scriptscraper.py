@@ -27,18 +27,19 @@ class MovieScript(object):
         for url in urls:
             if url[-1] == ':':
                 url = url[:-1]
-        self.url = root + '-'.join(url) + '.html'
+        self.url = root + '-'.join(urls) + '.html'
 
     def getScriptText(self):
         if self._debug:
             print 'Getting script text for %s...' % self.title
+
         try:
+            print 'trying...'
             sFile = urllib2.urlopen(self.url)
         except urllib2.URLError as e:
             if self._debug:
                 print 'Error opening %s...' % self.url
                 print 'URLERROR({0}): {1}'.format(e.errno, e.strerror)
-
         sHtml = sFile.read()
         sSoup = BeautifulSoup(sHtml)
         self._findScriptText(sSoup)
