@@ -66,7 +66,7 @@ class MovieScript(object):
             print 'Writing script to file for %s...' % self.title
         fp = open(os.path.join('scripts', self.filename), 'w')
         if not self.script==None:
-            fp.write(self.script)
+            fp.write(self.script.encode('utf8'))
         fp.close()
 
 class ScriptParse(object):
@@ -96,13 +96,22 @@ class ScriptParse(object):
         moviePs = self._getMovieListNodes(mpSoup)
         scriptList = self._convertTags(moviePs)
 
-        for script in scriptList:
-            #Edge Case
-            if script.title == '8 Mile':
-                continue
-            script.formatUrl()
-            script.getScriptText()
-            script.writeFile()
+        if self._options.start:
+            for script in scriptList[self._options.start:]:
+                script.formatUrl()
+                script.getScriptText()
+                script.writeFile()
+        else:
+            for script in scriptList:
+                script.formatUrl()
+                script.getScriptText()
+                script.writeFile()
+
+        #for i,script in enumerate(scriptList):
+            #print i, script
+            #script.formatUrl()
+            #script.getScriptText()
+            #script.writeFile()
 
         if self._options.verbose:
             print 'Done!'
@@ -145,6 +154,7 @@ def _parse_args():
                           version='%prog 1.0',
                           description='Scrape all movie scripts available on imsdb.com and save them to file')
     parser.add_option('-v', dest='verbose', action='store_true', default=False, help='Enable verbose output')
+    parser.add_option('-s', dest='start', type='int',default=None, help='Start at offset int')
     (options, args) = parser.parse_args()
     return options
 
