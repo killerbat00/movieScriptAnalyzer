@@ -1,0 +1,36 @@
+You must use these tools in a certain order.
+
+1. First, execute:
+    ./scriptscraper.py
+
+    Do so with the -v command line argument for verbose output.
+
+2. Next, execute:
+    ./pp.sh
+
+    This utility lists all the files in the scripts/ directory produced by
+        ./scriptscraper.py
+    It then invokes ./postpros.py on each file.
+
+3. ./postpros.py creates a new directory, processed_scripts and extracts
+    the majority of the script text from each file passed to it.
+    It then saves a new copy of the script in processed_scripts/ 
+        with a new .pp file extension to indicate it's been through 
+        post processing.
+
+4. Next, execute ./extract_bad.sh
+    Those files that had errors with html parsing or were unable 
+        to be processed are likely small after post processing.
+
+    ./extract_bad.sh lists all files in the processed_scripts directory.
+        It moves all files greater than 1k to a likely_good directory
+            created inside of processed_scripts/
+        
+5. Inspect remaining scripts in processed_scripts/
+    You can inspect the remaining scripts not in likely_good/
+    If everything worked, they should contain no script text and are
+        safe for removal.
+
+6. Execute ./cut_endlines.sh:
+    
+
